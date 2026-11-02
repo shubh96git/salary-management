@@ -81,7 +81,7 @@ erDiagram
     }
 ```
 
-Indexes: `country_code`, `(country_code, job_title)`, `(country_code, department)`, `lower(full_name)` for search.
+Indexes: `(country_code, job_title)` and `(country_code, department)` serve country filters and insight grouping (their leading column also covers country-only queries); `full_name` serves name search. The `utf8mb4_unicode_ci` collation makes comparisons case-insensitive, so no `lower()` index is needed. A `CHECK` constraint keeps salaries positive at the database level too.
 
 A single table is enough for the scope. Job titles and departments are plain columns rather than lookup tables; see [ADR 0003](decisions/0003-single-employee-table.md).
 
