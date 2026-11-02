@@ -5,6 +5,6 @@ Short records of significant decisions: the context, what was decided, and the t
 | # | Decision | Status |
 |---|---|---|
 | [0001](0001-single-deployable-monorepo.md) | One repository, one deployable application | Accepted |
-| [0002](0002-postgresql-with-flyway.md) | PostgreSQL with Flyway migrations | Proposed |
+| [0002](0002-mysql-with-flyway.md) | MySQL with Flyway migrations | Accepted |
 | [0003](0003-single-employee-table.md) | Single employee table, no lookup tables | Accepted |
 | [0004](0004-salary-in-local-currency.md) | Salaries stored and compared in local currency | Accepted |

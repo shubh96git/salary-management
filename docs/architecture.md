@@ -18,7 +18,7 @@ flowchart LR
         API --> SVC --> REPO
     end
 
-    REPO -->|JDBC| DB[(PostgreSQL)]
+    REPO -->|JDBC| DB[(MySQL 8)]
     SEED[Seed runner<br/>10,000 employees] -->|batch insert| DB
     FLY[Flyway migrations] -->|schema| DB
 ```
@@ -28,11 +28,11 @@ flowchart LR
 | Layer | Choice |
 |---|---|
 | Backend | Java 21, Spring Boot 3, Spring Web, Spring Data JPA, Bean Validation |
-| Database | PostgreSQL; schema managed by Flyway |
+| Database | MySQL 8; schema managed by Flyway |
 | Frontend | Angular (latest stable), Angular Material |
 | Build | Maven wrapper (backend), Angular CLI via npm (frontend) |
 | Tests | JUnit 5, AssertJ, Mockito, Spring test slices; Angular's default test runner |
-| Deployment | One Docker image on a free-tier host, managed PostgreSQL |
+| Deployment | One Docker image on a free-tier host, managed MySQL |
 
 ## Repository layout
 
@@ -110,7 +110,7 @@ Errors use a consistent JSON shape (RFC 7807 problem details) with field-level v
 ## Performance considerations
 
 - **Pagination on the server.** The list endpoint never returns more than one page (default 20, max 100).
-- **Aggregates in SQL.** `GROUP BY` with `MIN/MAX/AVG` and `percentile_cont(0.5)` for median; the application never loads 10,000 rows to compute statistics.
+- **Aggregates in SQL.** `GROUP BY` with `MIN/MAX/AVG`, and window functions for the median (MySQL has no median function); the application never loads 10,000 rows to compute statistics.
 - **Indexes** match the filter and group-by columns above.
 - **Seeding** uses JDBC batch inserts, so 10,000 rows load in seconds.
 - At 10,000 rows, caching is not needed. If data grew 100×, the first steps would be caching insight results and a materialised view refreshed on write.

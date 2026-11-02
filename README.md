@@ -17,7 +17,7 @@ A web application for ACME's HR Manager to manage salary data for 10,000 employe
 
 ## Tech stack
 
-Java 21 · Spring Boot 3 · PostgreSQL · Flyway · Angular · Angular Material
+Java 21 · Spring Boot 3 · MySQL 8 · Flyway · Angular · Angular Material
 
 ## Running locally
 
