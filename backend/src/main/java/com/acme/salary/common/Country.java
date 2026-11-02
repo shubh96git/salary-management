@@ -1,5 +1,6 @@
 package com.acme.salary.common;
 
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.Optional;
 
@@ -24,7 +25,9 @@ public enum Country {
     }
 
     public static Optional<Country> fromCode(String code) {
-        return Optional.empty();
+        return Arrays.stream(values())
+                .filter(country -> country.code.equalsIgnoreCase(code))
+                .findFirst();
     }
 
     public String code() {
