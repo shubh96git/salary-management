@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: salary-management
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/salary_management}
+    username: ${DB_USERNAME:salary_app}
+    password: ${DB_PASSWORD}
+  jpa:
+    # Flyway owns the schema; Hibernate only checks that entities match it.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
