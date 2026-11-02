@@ -29,4 +29,16 @@ How AI tools were used to build this project, what they were asked, and where th
 
 - **Prompt (summary):** Initialise the repository and draft the requirements document plus all planning artifacts before any code.
 - **AI output:** Requirements, architecture (with diagrams), ADRs, delivery plan and this working agreement.
-- **Developer judgement:** Reviewed scope and assumptions before committing.
+- **Developer judgement:** Reviewed scope and assumptions before committing. Reworded assumptions as justified decisions rather than open questions.
+
+### 4. Database choice
+
+- **Prompt (summary):** Asked whether MySQL, already installed locally, could replace the planned PostgreSQL.
+- **AI output:** Confirmed MySQL 8 fits, named the trade-off (no built-in median, so window functions are needed) and updated the decision record.
+- **Developer judgement:** Chose MySQL to keep development and production on the same engine without another install.
+
+### 5. Backend skeleton
+
+- **Prompt (summary):** Set up the Spring Boot project.
+- **AI output:** Checked Spring Initializr before generating and found only Spring Boot 4.x offered (3.x is out of open-source support), so used 4.1.2 instead of the planned 3.x. Removed generator noise, moved database settings to environment variables, and verified the startup test against local MySQL before committing.
+- **Developer judgement:** Accepted Spring Boot 4; kept credentials out of the repository.

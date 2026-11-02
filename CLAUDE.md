@@ -5,7 +5,7 @@ This file instructs the AI coding assistant (Claude Code) used to build this pro
 ## Context
 
 - Read `docs/requirements.md` and `docs/architecture.md` before making changes. Stay inside the documented scope; propose scope changes instead of making them.
-- Stack: Java 21, Spring Boot 3, Maven wrapper, MySQL 8 + Flyway, Angular + Angular Material.
+- Stack: Java 21, Spring Boot 4, Maven wrapper, MySQL 8 + Flyway, Angular + Angular Material.
 
 ## How to work
 

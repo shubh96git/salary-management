@@ -17,8 +17,45 @@ A web application for ACME's HR Manager to manage salary data for 10,000 employe
 
 ## Tech stack
 
-Java 21 · Spring Boot 3 · MySQL 8 · Flyway · Angular · Angular Material
+Java 21 · Spring Boot 4 · MySQL 8 · Flyway · Angular · Angular Material
 
 ## Running locally
 
-_To be added with the backend skeleton._
+### Prerequisites
+
+- JDK 21 (`JAVA_HOME` pointing to it)
+- MySQL 8 running on `localhost:3306`
+
+Maven does not need to be installed; the project uses the Maven wrapper.
+
+### Database
+
+Run once as the MySQL `root` user:
+
+```sql
+CREATE DATABASE salary_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'salary_app'@'localhost' IDENTIFIED BY '<password>';
+GRANT ALL PRIVILEGES ON salary_management.* TO 'salary_app'@'localhost';
+```
+
+The schema itself is created by Flyway when the application starts.
+
+### Configuration
+
+The backend reads its database settings from environment variables:
+
+| Variable | Default | Required |
+|---|---|---|
+| `DB_URL` | `jdbc:mysql://localhost:3306/salary_management` | No |
+| `DB_USERNAME` | `salary_app` | No |
+| `DB_PASSWORD` | — | Yes |
+
+### Backend
+
+```bash
+cd backend
+./mvnw spring-boot:run    # start on http://localhost:8080
+./mvnw test               # run the tests
+```
+
+Health check: <http://localhost:8080/actuator/health>

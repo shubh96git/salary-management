@@ -27,7 +27,7 @@ flowchart LR
 
 | Layer | Choice |
 |---|---|
-| Backend | Java 21, Spring Boot 3, Spring Web, Spring Data JPA, Bean Validation |
+| Backend | Java 21, Spring Boot 4, Spring Web MVC, Spring Data JPA, Bean Validation |
 | Database | MySQL 8; schema managed by Flyway |
 | Frontend | Angular (latest stable), Angular Material |
 | Build | Maven wrapper (backend), Angular CLI via npm (frontend) |
