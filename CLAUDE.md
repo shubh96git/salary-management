@@ -10,7 +10,8 @@ This file instructs the AI coding assistant (Claude Code) used to build this pro
 ## How to work
 
 - **Test first.** For business logic, write a failing test, then the minimum code to pass, then refactor.
-- **Small steps.** One behaviour per change. Every commit must build and pass all tests.
+- **Small steps.** One behaviour per change.
+- **TDD is visible in history.** Commit the failing test first (`test:`, the only kind of commit allowed to fail, and only on the new test), then the code that makes it pass (`feat:`/`fix:`), then any `refactor:`. Failing tests compile against a minimal stub, so they fail on an assertion, not a compile error. Every non-`test:` commit builds and passes all tests.
 - **Explain, don't just generate.** State the reasoning for non-obvious design choices; record significant ones as an ADR in `docs/decisions/`.
 - **Ask when unsure.** Do not invent requirements; flag ambiguity to the developer.
 

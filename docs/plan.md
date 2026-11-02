@@ -19,7 +19,7 @@ How the solution will be built, in order. Each milestone ends in a working, test
 
 ## Way of working
 
-- **Test-driven development** for business logic: write a failing test, make it pass, then refactor.
+- **Test-driven development** for business logic: write a failing test, make it pass, then refactor. Each step is its own commit, so the red → green → refactor cycle is visible in the history; only `test:` commits may contain a failing test.
 - **Small commits** that each build and pass tests, using [Conventional Commits](https://www.conventionalcommits.org/):
 
   | Prefix | Use |
