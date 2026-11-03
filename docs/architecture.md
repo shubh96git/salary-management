@@ -52,15 +52,17 @@ Packaged **by feature**, layered inside each feature:
 ```
 com.acme.salary
 ├── employee/     Employee entity, repository, service, controller, DTOs
-├── insights/     aggregate queries, service, controller, response records
-├── seed/         deterministic employee generator + seed runner
-└── common/       error handling, country/currency reference data
+├── insights/     SQL aggregate queries, controller, response records
+├── seed/         deterministic employee generator, batch seeder, startup runner
+└── common/       error handling, country/currency reference data, paging response
 ```
 
 - **Controllers** translate HTTP to service calls; no business logic.
-- **Services** hold the rules (validation beyond annotations, currency derivation).
-- **Repositories** own persistence; insights use dedicated SQL aggregate queries.
+- **Services** hold the rules (unique email, no future hire dates). Rules that belong to the data itself live in the entity: currency always follows country, salaries always have two decimal places.
+- **Repositories** own persistence; insights use dedicated SQL aggregate queries through `JdbcClient`.
+- **Insights have no service layer.** They are read-only queries with no business rules, so a pass-through service would add code without adding behaviour. One would be introduced as soon as a rule appears (for example, hiding groups too small to stay anonymous).
 - **DTOs** at the API boundary; entities are never exposed directly.
+- **Errors** map from a few generic exception types in `common` (not found, invalid request, conflict), so the error handler does not depend on any feature.
 
 ## Data model
 
@@ -85,22 +87,23 @@ Indexes: `(country_code, job_title)` and `(country_code, department)` serve coun
 
 A single table is enough for the scope. Job titles and departments are plain columns rather than lookup tables; see [ADR 0003](decisions/0003-single-employee-table.md).
 
-## API (initial sketch)
+## API
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/employees?search=&country=&jobTitle=&department=&page=&size=&sort=` | Paginated, filtered list |
+| GET | `/api/employees?search=&country=&jobTitle=&department=&page=&size=&sort=` | Paginated, filtered list (default 20 per page sorted by name, max 100) |
+| GET | `/api/employees/filter-options` | Supported countries (with currency), job titles and departments in use |
 | GET | `/api/employees/{id}` | One employee |
-| POST | `/api/employees` | Create |
+| POST | `/api/employees` | Create (201 with `Location`) |
 | PUT | `/api/employees/{id}` | Update |
-| DELETE | `/api/employees/{id}` | Delete |
-| GET | `/api/insights/summary` | Headcount overall and per country |
-| GET | `/api/insights/countries` | Salary stats per country |
-| GET | `/api/insights/countries/{code}/job-titles` | Salary stats per job title in a country |
-| GET | `/api/insights/countries/{code}/departments` | Salary stats per department in a country |
-| GET | `/api/reference/filters` | Distinct countries, job titles, departments for UI filters |
+| DELETE | `/api/employees/{id}` | Delete (204) |
+| GET | `/api/insights/countries` | Headcount, min, max, average, median and total payroll per country |
+| GET | `/api/insights/countries/{code}/job-titles` | The same statistics per job title within a country |
+| GET | `/api/insights/countries/{code}/departments` | The same statistics per department within a country |
 
-Errors use a consistent JSON shape (RFC 7807 problem details) with field-level validation messages.
+Changes from the initial sketch: the separate `/api/insights/summary` endpoint was dropped because per-country headcounts already answer it (the UI sums them for the org total), and filter values moved to `/api/employees/filter-options` because they belong to the employee list.
+
+Errors use a consistent JSON shape (RFC 7807 problem details): 400 for invalid input (with an `errors` map per field), 404 for unknown employees, 409 for duplicate emails.
 
 ## UI screens
 

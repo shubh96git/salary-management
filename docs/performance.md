@@ -26,3 +26,19 @@ Measurements and decisions about speed, recorded as they were made. Numbers are 
 - **Employee list:** paginated in the database (default 20 rows, maximum 100), so response size stays constant regardless of headcount.
 - **Search:** `LIKE '%text%'` on name and email cannot use an index, so it scans the table. At 10,000 rows this is a few milliseconds; at millions of rows a full-text index would be the next step.
 - **Filters:** country, job title and department filters use the composite indexes `(country_code, job_title)` and `(country_code, department)`.
+
+## Insights
+
+All statistics are computed in one SQL query per screen: `GROUP BY` for minimum, maximum, average and total, and `ROW_NUMBER()` / `COUNT()` window functions for the median. The application never loads employees to aggregate them.
+
+Measured over the 10,000 seeded employees (warm application, local MySQL):
+
+| Request | Time |
+|---|---|
+| `/api/insights/countries` (all countries, including median) | 69 ms |
+| `/api/insights/countries/IN/job-titles` | 53 ms |
+| `/api/insights/countries/US/departments` | 43 ms |
+| `/api/employees?search=rao&country=IN&sort=annualSalary,desc` | 149 ms |
+| `/api/employees/filter-options` | 22 ms |
+
+All are well within the 500 ms target. At 10,000 rows no caching is needed; if headcount grew by orders of magnitude, insight results could be cached or precomputed, because salary data changes rarely compared with how often it is read.

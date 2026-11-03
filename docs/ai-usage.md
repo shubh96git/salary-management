@@ -60,3 +60,12 @@ How AI tools were used to build this project, what they were asked, and where th
 - **AI output:** A pure, deterministic generator (country-typical names, job-to-department mapping, salary bands scaled per market) tested for size, determinism, unique emails, valid data and pay seniority; plus an idempotent JDBC batch seeder tested against MySQL.
 - **Where AI output was checked or corrected:** Seeding took 8–10 s, which looked too slow. Instead of tuning blindly, the time was measured: a raw SQL insert of the same 10,000 rows took 7.3 s, proving the local database, not the code, was the limit. Recorded in [performance.md](performance.md).
 - **Developer judgement:** Seeding stays off by default and is enabled per environment.
+
+### 8. Salary insights
+
+- **Prompt (summary):** Answer "how does the org pay people?" with statistics per country, job title and department.
+- **AI output:** One SQL template with window functions for the median, tested against MySQL with small hand-checkable data (even and odd group sizes); REST endpoints and filter options built test-first.
+- **Where AI output was checked or corrected:**
+  - Adding seed data to the development database broke 8 existing tests, which had silently shared that database. Tests were moved to a dedicated test database via a shared `@DatabaseTest` annotation.
+  - Medians were checked by hand in the tests (250 for 100/200/300/1000; 70 for 50/70/90) and against the seeded data, where medians sit below averages as expected for salaries.
+- **Developer judgement:** No pass-through service for read-only insights; endpoints measured at 20–150 ms over 10,000 employees.
