@@ -14,6 +14,9 @@ public class EmployeeService {
     }
 
     public Employee create(EmployeeDetails details) {
+        if (repository.existsByEmail(details.email())) {
+            throw new DuplicateEmailException(details.email());
+        }
         return repository.save(new Employee(details));
     }
 }
