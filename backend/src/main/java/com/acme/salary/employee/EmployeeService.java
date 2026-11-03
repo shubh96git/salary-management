@@ -21,7 +21,7 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public Page<Employee> search(EmployeeSearchCriteria criteria, Pageable pageable) {
-        return Page.empty(pageable);
+        return repository.findAll(criteria.toSpecification(), pageable);
     }
 
     @Transactional(readOnly = true)
