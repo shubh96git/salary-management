@@ -33,4 +33,17 @@ class EmployeeRepositoryTest {
         assertThat(reloaded.getAnnualSalary()).isEqualByComparingTo(details.annualSalary());
         assertThat(reloaded.getHireDate()).isEqualTo(details.hireDate());
     }
+
+    @Test
+    void listsDistinctJobTitlesAndDepartmentsAlphabetically() {
+        repository.save(new Employee(anEmployee().withEmail("a@acme.example")
+                .withJobTitle("Software Engineer").withDepartment("Engineering").details()));
+        repository.save(new Employee(anEmployee().withEmail("b@acme.example")
+                .withJobTitle("Product Manager").withDepartment("Product").details()));
+        repository.save(new Employee(anEmployee().withEmail("c@acme.example")
+                .withJobTitle("Software Engineer").withDepartment("Engineering").details()));
+
+        assertThat(repository.findDistinctJobTitles()).containsExactly("Product Manager", "Software Engineer");
+        assertThat(repository.findDistinctDepartments()).containsExactly("Engineering", "Product");
+    }
 }

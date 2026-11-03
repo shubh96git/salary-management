@@ -51,7 +51,7 @@ public class EmployeeController {
 
     @GetMapping("/filter-options")
     public FilterOptions filterOptions() {
-        return null;
+        return service.filterOptions();
     }
 
     @GetMapping("/{id}")

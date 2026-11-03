@@ -1,7 +1,9 @@
 package com.acme.salary.employee;
 
+import com.acme.salary.common.Country;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.Arrays;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,13 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public FilterOptions filterOptions() {
-        return null;
+        return new FilterOptions(
+                Arrays.stream(Country.values())
+                        .map(country -> new FilterOptions.CountryOption(
+                                country.code(), country.displayName(), country.currency().getCurrencyCode()))
+                        .toList(),
+                repository.findDistinctJobTitles(),
+                repository.findDistinctDepartments());
     }
 
     @Transactional(readOnly = true)
