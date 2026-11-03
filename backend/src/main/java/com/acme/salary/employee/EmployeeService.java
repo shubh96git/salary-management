@@ -1,5 +1,6 @@
 package com.acme.salary.employee;
 
+import java.time.Clock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeService {
 
     private final EmployeeRepository repository;
+    private final Clock clock;
 
-    public EmployeeService(EmployeeRepository repository) {
+    public EmployeeService(EmployeeRepository repository, Clock clock) {
         this.repository = repository;
+        this.clock = clock;
     }
 
     public Employee create(EmployeeDetails details) {
