@@ -19,7 +19,7 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public Employee get(Long id) {
-        return null;
+        return repository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     public Employee create(EmployeeDetails details) {
