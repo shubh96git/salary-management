@@ -4,6 +4,7 @@ import static com.acme.salary.employee.EmployeeFixtures.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.acme.salary.common.Country;
+import java.math.BigDecimal;
 import java.util.Currency;
 import org.junit.jupiter.api.Test;
 
@@ -23,5 +24,12 @@ class EmployeeTest {
         employee.update(anEmployee().withCountry(Country.GERMANY).details());
 
         assertThat(employee.getCurrency()).isEqualTo(Currency.getInstance("EUR"));
+    }
+
+    @Test
+    void keepsSalaryToTwoDecimalPlaces() {
+        Employee employee = new Employee(anEmployee().withAnnualSalary(new BigDecimal("61000")).details());
+
+        assertThat(employee.getAnnualSalary()).hasToString("61000.00");
     }
 }

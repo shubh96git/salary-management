@@ -52,6 +52,11 @@ final class EmployeeFixtures {
             return this;
         }
 
+        Builder withAnnualSalary(BigDecimal annualSalary) {
+            this.annualSalary = annualSalary;
+            return this;
+        }
+
         Builder withHireDate(LocalDate hireDate) {
             this.hireDate = hireDate;
             return this;
