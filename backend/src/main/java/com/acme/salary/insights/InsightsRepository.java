@@ -2,6 +2,7 @@ package com.acme.salary.insights;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import com.acme.salary.common.Country;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -47,6 +48,16 @@ public class InsightsRepository {
     /** One entry per country, in local currency, largest headcount first. */
     public List<SalaryStats> byCountry() {
         return jdbc.sql(STATS_BY_COUNTRY).query(InsightsRepository::toStats).list();
+    }
+
+    /** One entry per job title in the country, largest headcount first. */
+    public List<SalaryStats> byJobTitle(Country country) {
+        return List.of();
+    }
+
+    /** One entry per department in the country, largest headcount first. */
+    public List<SalaryStats> byDepartment(Country country) {
+        return List.of();
     }
 
     private static SalaryStats toStats(ResultSet row, int rowNumber) throws SQLException {

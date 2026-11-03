@@ -51,6 +51,28 @@ class InsightsRepositoryTest {
                 stats("US", "USD", 3, "50.00", "90.00", "70.00", "70.00", "210.00"));
     }
 
+    @Test
+    void breaksDownPayByJobTitleWithinACountry() {
+        assertThat(insights.byJobTitle(Country.INDIA)).containsExactly(
+                stats("Software Engineer", "INR", 2, "100.00", "300.00", "200.00", "200.00", "400.00"),
+                stats("Engineering Manager", "INR", 1, "1000.00", "1000.00", "1000.00", "1000.00", "1000.00"),
+                stats("Product Manager", "INR", 1, "200.00", "200.00", "200.00", "200.00", "200.00"));
+    }
+
+    @Test
+    void breaksDownPayByDepartmentWithinACountry() {
+        // Engineering in India: 100, 300 and 1000, so the median is the middle value, 300.
+        assertThat(insights.byDepartment(Country.INDIA)).containsExactly(
+                stats("Engineering", "INR", 3, "100.00", "1000.00", "466.67", "300.00", "1400.00"),
+                stats("Product", "INR", 1, "200.00", "200.00", "200.00", "200.00", "200.00"));
+    }
+
+    @Test
+    void findsNoBreakdownForACountryWithoutEmployees() {
+        assertThat(insights.byJobTitle(Country.GERMANY)).isEmpty();
+        assertThat(insights.byDepartment(Country.GERMANY)).isEmpty();
+    }
+
     private void hire(Country country, String jobTitle, String department, String salary) {
         sequence++;
         employees.save(new Employee(new EmployeeDetails(
