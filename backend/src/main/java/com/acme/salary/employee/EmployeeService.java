@@ -32,6 +32,10 @@ public class EmployeeService {
 
     public Employee update(Long id, EmployeeDetails details) {
         Employee employee = get(id);
+        rejectFutureHireDate(details);
+        if (repository.existsByEmailAndIdNot(details.email(), id)) {
+            throw new DuplicateEmailException(details.email());
+        }
         employee.update(details);
         return employee;
     }
