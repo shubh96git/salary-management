@@ -49,6 +49,11 @@ public class EmployeeController {
         return PageResponse.from(service.search(criteria, pageable), EmployeeResponse::from);
     }
 
+    @GetMapping("/filter-options")
+    public FilterOptions filterOptions() {
+        return null;
+    }
+
     @GetMapping("/{id}")
     public EmployeeResponse get(@PathVariable Long id) {
         return EmployeeResponse.from(service.get(id));

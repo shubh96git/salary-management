@@ -170,4 +170,18 @@ class EmployeeServiceTest {
 
         assertThat(result).isSameAs(matches);
     }
+
+    @Test
+    void offersEverySupportedCountryAndTheTitlesAndDepartmentsInUse() {
+        when(repository.findDistinctJobTitles()).thenReturn(List.of("Product Manager", "Software Engineer"));
+        when(repository.findDistinctDepartments()).thenReturn(List.of("Engineering", "Product"));
+
+        FilterOptions options = service.filterOptions();
+
+        assertThat(options).isNotNull();
+        assertThat(options.countries()).hasSize(Country.values().length)
+                .contains(new FilterOptions.CountryOption("IN", "India", "INR"));
+        assertThat(options.jobTitles()).containsExactly("Product Manager", "Software Engineer");
+        assertThat(options.departments()).containsExactly("Engineering", "Product");
+    }
 }

@@ -109,6 +109,25 @@ class EmployeeControllerTest {
     }
 
     @Test
+    void returnsFilterOptions() {
+        when(service.filterOptions()).thenReturn(new FilterOptions(
+                List.of(new FilterOptions.CountryOption("IN", "India", "INR")),
+                List.of("Software Engineer"),
+                List.of("Engineering")));
+
+        assertThat(mvc.get().uri("/api/employees/filter-options"))
+                .hasStatusOk()
+                .bodyJson()
+                .isLenientlyEqualTo("""
+                        {
+                          "countries": [ { "code": "IN", "name": "India", "currency": "INR" } ],
+                          "jobTitles": [ "Software Engineer" ],
+                          "departments": [ "Engineering" ]
+                        }
+                        """);
+    }
+
+    @Test
     void returnsEmployeeById() {
         when(service.get(7L)).thenReturn(anEmployee()
                 .withEmail("asha.rao@acme.example")

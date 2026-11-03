@@ -25,6 +25,11 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
+    public FilterOptions filterOptions() {
+        return null;
+    }
+
+    @Transactional(readOnly = true)
     public Employee get(Long id) {
         return repository.findById(id).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
