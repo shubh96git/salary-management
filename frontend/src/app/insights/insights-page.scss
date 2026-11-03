@@ -1,0 +1,104 @@
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.title {
+  font: var(--mat-sys-headline-small);
+  margin: 0;
+}
+
+.summary {
+  font: var(--mat-sys-title-medium);
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.note {
+  margin: 8px 0 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.card {
+  position: relative;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface);
+
+  mat-progress-bar {
+    position: absolute;
+    top: 0;
+  }
+}
+
+.section-title {
+  font: var(--mat-sys-title-medium);
+  margin: 0;
+  padding: 16px 16px 8px;
+}
+
+.breakdown-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 16px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.numeric {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.selected {
+  background: var(--mat-sys-secondary-container);
+}
+
+a {
+  color: var(--mat-sys-primary);
+  font-weight: 500;
+}
+
+.prompt {
+  margin: 0;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.spread-cell {
+  min-width: 160px;
+}
+
+.spread {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--mat-sys-surface-container-high);
+}
+
+.spread-range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 6px;
+  background: var(--mat-sys-primary-container);
+}
+
+.spread-median {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 3px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--mat-sys-primary);
+}
