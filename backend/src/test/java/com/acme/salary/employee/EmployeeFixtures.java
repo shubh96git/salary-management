@@ -3,6 +3,7 @@ package com.acme.salary.employee;
 import com.acme.salary.common.Country;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Valid employee data for tests; each test overrides only what it cares about.
@@ -58,6 +59,13 @@ final class EmployeeFixtures {
 
         EmployeeDetails details() {
             return new EmployeeDetails(fullName, email, jobTitle, department, country, annualSalary, hireDate);
+        }
+
+        /** An employee as if loaded from the database, with its id assigned. */
+        Employee persistedWithId(long id) {
+            Employee employee = new Employee(details());
+            ReflectionTestUtils.setField(employee, "id", id);
+            return employee;
         }
     }
 }
