@@ -57,6 +57,7 @@ public class Employee {
         this.jobTitle = details.jobTitle();
         this.department = details.department();
         this.country = details.country();
+        this.currency = details.country().currency();
         this.annualSalary = details.annualSalary();
         this.hireDate = details.hireDate();
     }
