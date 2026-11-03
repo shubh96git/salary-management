@@ -17,6 +17,6 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     public EmployeeResponse get(@PathVariable Long id) {
-        return null;
+        return EmployeeResponse.from(service.get(id));
     }
 }
