@@ -105,10 +105,27 @@ Changes from the initial sketch: the separate `/api/insights/summary` endpoint w
 
 Errors use a consistent JSON shape (RFC 7807 problem details): 400 for invalid input (with an `errors` map per field), 404 for unknown employees, 409 for duplicate emails.
 
+## Frontend structure
+
+Angular 22 with standalone components, signals and Angular Material, organised by feature to mirror the backend:
+
+```
+frontend/src/app
+├── employees/   list page, form dialog, API client, models
+├── insights/    insights page, API client, models
+└── shared/      confirmation dialog
+```
+
+- **State** lives in signals. Server data is loaded with `rxResource`, which tracks loading and errors and reloads when its parameters (the list query, the selected country) change.
+- **Each page loads lazily**, so the Employees page's table and form code is not downloaded until it is opened.
+- **The selected country is in the URL** (`/insights/IN`), so a breakdown can be bookmarked; Spring Boot forwards these routes to `index.html`.
+- **Server validation** messages from the API's `errors` map are shown on the matching form fields.
+- **Tests** drive components through Angular Material's component harnesses against fake API clients, so they read like a user's actions and need no server.
+
 ## UI screens
 
 1. **Employees:** table with search, filters, pagination and sorting; add/edit form in a dialog; delete with confirmation.
-2. **Insights:** country summary table; select a country to see job title and department breakdowns.
+2. **Insights:** country summary table; select a country to see job title and department breakdowns, each with a range bar.
 
 ## Performance considerations
 

@@ -69,3 +69,16 @@ How AI tools were used to build this project, what they were asked, and where th
   - Adding seed data to the development database broke 8 existing tests, which had silently shared that database. Tests were moved to a dedicated test database via a shared `@DatabaseTest` annotation.
   - Medians were checked by hand in the tests (250 for 100/200/300/1000; 70 for 50/70/90) and against the seeded data, where medians sit below averages as expected for salaries.
 - **Developer judgement:** No pass-through service for read-only insights; endpoints measured at 20–150 ms over 10,000 employees.
+
+### 9. Angular frontend
+
+- **Prompt (summary):** Build the Employees and Insights screens test-first.
+- **AI output:** Angular 22 with standalone components, signals and Material; red → green commits for the API clients, list page, form dialog and insights page, tested through component harnesses.
+- **Where AI output was checked or corrected:**
+  - Angular 22 needed Node 22.22.3; the developer upgraded Node rather than staying on an older Angular.
+  - The CLI's version ranges pulled in releases only days old (including a test runner published the day before). Dependencies were pinned to exact versions at least two weeks old, with one deliberate exception: the build tools were moved to a newer patch because it fixes Vite dev-server security advisories (`npm audit`: 0 vulnerabilities).
+  - npm crashed on a peer-dependency cycle (`vitest` ↔ `msw`); solved with an `overrides` entry rather than `--force`.
+  - The production build warned (NG8011) that an `@if` around the salary suffix blocked content projection, which the tests had not caught. Fixed in its own commit.
+  - The hire-date limit used `toISOString()`, which is UTC and would reject "today" for part of the day in India. Changed to the local date.
+- **Developer judgement:** Upgraded Node rather than staying on an older Angular.
+

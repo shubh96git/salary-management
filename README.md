@@ -26,6 +26,7 @@ Java 21 · Spring Boot 4 · MySQL 8 · Flyway · Angular · Angular Material
 
 - JDK 21 (`JAVA_HOME` pointing to it)
 - MySQL 8 running on `localhost:3306`
+- Node.js 22.22.3 or later (for the frontend)
 
 Maven does not need to be installed; the project uses the Maven wrapper.
 
@@ -78,3 +79,20 @@ cd backend
 ```
 
 Health check: <http://localhost:8080/actuator/health>
+
+### Frontend
+
+With the backend running on port 8080:
+
+```bash
+cd frontend
+npm ci                    # install the exact dependency versions from package-lock.json
+npm start                 # start on http://localhost:4200; /api is proxied to the backend
+npm test -- --watch=false # run the tests once
+```
+
+## Using the application
+
+- **Employees** (`/employees`): search by name or email, filter by country, job title and department, sort any column, and page through results. Add, edit and delete employees; deleting asks for confirmation. Salaries are shown in each employee's local currency.
+- **Insights** (`/insights`): headcount, median, average, range and total payroll per country. Select a country (`/insights/IN`) to see the same figures per job title or department, with a bar showing each group's pay range and median.
+
