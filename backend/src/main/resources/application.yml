@@ -5,6 +5,10 @@ spring:
     url: ${DB_URL:jdbc:mysql://localhost:3306/salary_management}
     username: ${DB_USERNAME:salary_app}
     password: ${DB_PASSWORD}
+    hikari:
+      data-source-properties:
+        # Lets the MySQL driver send JDBC batches as multi-row inserts (used by the seeder).
+        rewriteBatchedStatements: true
   jpa:
     # Flyway owns the schema; Hibernate only checks that entities match it.
     hibernate:
@@ -14,6 +18,12 @@ spring:
     web:
       pageable:
         max-page-size: 100
+
+salary:
+  seed:
+    enabled: ${SEED_ENABLED:false}
+    employees: 10000
+    random-seed: 42
 
 management:
   endpoints:
