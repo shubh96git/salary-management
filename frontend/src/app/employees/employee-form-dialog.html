@@ -53,10 +53,9 @@
     <mat-form-field appearance="outline" class="field-annualSalary">
       <mat-label>Annual salary</mat-label>
       <input matInput formControlName="annualSalary" type="number" min="0" step="100" />
-      @if (currency(); as currency) {
-        <span matTextSuffix>{{ currency }}</span>
-        <mat-hint>Annual gross, in {{ currency }}</mat-hint>
-      }
+      <!-- Always rendered: wrapping these in @if would stop them being projected into the field. -->
+      <span matTextSuffix>{{ currency() }}</span>
+      <mat-hint>{{ currency() ? 'Annual gross, in ' + currency() : 'Annual gross' }}</mat-hint>
       <mat-error>{{ errorFor('annualSalary') }}</mat-error>
     </mat-form-field>
 
