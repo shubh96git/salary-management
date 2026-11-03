@@ -42,3 +42,14 @@ How AI tools were used to build this project, what they were asked, and where th
 - **Prompt (summary):** Set up the Spring Boot project.
 - **AI output:** Checked Spring Initializr before generating and found only Spring Boot 4.x offered (3.x is out of open-source support), so used 4.1.2 instead of the planned 3.x. Removed generator noise, moved database settings to environment variables, and verified the startup test against local MySQL before committing.
 - **Developer judgement:** Accepted Spring Boot 4; kept credentials out of the repository.
+
+### 6. Employee management API (test-driven)
+
+- **Prompt (summary):** Build employee create, read, update, delete and search test-first, committing every red, green and refactor step.
+- **AI output:** Small red → green → refactor cycles for the domain, service, search and REST layers, with each red commit failing on an assertion rather than a compile error.
+- **Where AI output was checked or corrected:**
+  - A first draft used a backslash as the SQL `LIKE` escape character. MySQL also treats backslashes as escapes inside string literals, so `!` was used instead, with a test proving `%` is matched literally.
+  - Spring Boot 4 moved several test annotations to new packages. Their locations were looked up in the downloaded libraries rather than guessed from Boot 3 examples.
+  - One test run reported "unresolved compilation problems" because the IDE's background compiler rewrote `target/` mid-build. Diagnosed from the error format and fixed by always running clean builds.
+  - Unit tests passed, but a manual end-to-end run against MySQL showed an updated salary returned as `61000` instead of `61000.00`. Fixed in the domain with a new test.
+- **Developer judgement:** Chose red/green commits so test-first is visible in the history; asked for every step to be committed and nothing pushed until reviewed.
