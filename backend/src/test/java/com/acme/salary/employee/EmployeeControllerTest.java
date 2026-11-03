@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -197,6 +198,17 @@ class EmployeeControllerTest {
                 .hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
                 .extractingPath("$.detail").isEqualTo("An employee with email asha.rao@acme.example already exists");
+    }
+
+    @Test
+    void answersConflictWhenTheDatabaseRejectsAConcurrentDuplicate() {
+        when(service.create(any(EmployeeDetails.class)))
+                .thenThrow(new DataIntegrityViolationException("Duplicate entry for key 'uk_employee_email'"));
+
+        assertThat(mvc.post().uri("/api/employees").contentType(MediaType.APPLICATION_JSON).content(VALID_REQUEST))
+                .hasStatus(HttpStatus.CONFLICT)
+                .bodyJson()
+                .extractingPath("$.detail").isEqualTo("The change conflicts with existing data");
     }
 
     @Test
