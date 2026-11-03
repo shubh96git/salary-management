@@ -1,6 +1,8 @@
 package com.acme.salary.employee;
 
-public class InvalidEmployeeException extends RuntimeException {
+import com.acme.salary.common.InvalidRequestException;
+
+public class InvalidEmployeeException extends InvalidRequestException {
 
     public InvalidEmployeeException(String message) {
         super(message);
