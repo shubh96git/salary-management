@@ -2,13 +2,16 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { MatInputHarness } from '@angular/material/input/testing';
 import { MatPaginatorHarness } from '@angular/material/paginator/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSortHarness } from '@angular/material/sort/testing';
 import { MatTableHarness } from '@angular/material/table/testing';
 import { of } from 'rxjs';
+import { ConfirmDialog } from '../shared/confirm-dialog';
 import { EmployeeApi } from './employee-api';
+import { EmployeeFormDialog } from './employee-form-dialog';
 import { Employee, Page } from './employee.model';
 import { EmployeesPage } from './employees-page';
 import { FILTER_OPTIONS, aPageOf, anEmployee } from './testing/employee-fixtures';
@@ -16,16 +19,27 @@ import { FILTER_OPTIONS, aPageOf, anEmployee } from './testing/employee-fixtures
 describe('EmployeesPage', () => {
   let fixture: ComponentFixture<EmployeesPage>;
   let loader: HarnessLoader;
-  let api: { list: ReturnType<typeof vi.fn>; filterOptions: ReturnType<typeof vi.fn> };
+  let api: {
+    list: ReturnType<typeof vi.fn>;
+    filterOptions: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
+  let dialog: { open: ReturnType<typeof vi.fn> };
 
-  async function render(page: Page<Employee>) {
+  /** @param dialogResult what any dialog opened by the page closes with */
+  async function render(page: Page<Employee>, dialogResult?: unknown) {
     api = {
       list: vi.fn(() => of(page)),
       filterOptions: vi.fn(() => of(FILTER_OPTIONS)),
+      delete: vi.fn(() => of(undefined)),
     };
+    dialog = { open: vi.fn(() => ({ afterClosed: () => of(dialogResult) })) };
     TestBed.configureTestingModule({
       imports: [EmployeesPage],
-      providers: [{ provide: EmployeeApi, useValue: api }],
+      providers: [
+        { provide: EmployeeApi, useValue: api },
+        { provide: MatDialog, useValue: dialog },
+      ],
     });
     fixture = TestBed.createComponent(EmployeesPage);
     loader = TestbedHarnessEnvironment.loader(fixture);
@@ -166,6 +180,72 @@ describe('EmployeesPage', () => {
 
       expect(lastQuery()).toMatchObject({ search: '', country: '', jobTitle: '', department: '' });
       expect(await country.getValueText()).toBe('All countries');
+    });
+  });
+
+  describe('changing employees', () => {
+    const ASHA = anEmployee({ id: 7, fullName: 'Asha Rao' });
+
+    async function click(text: string) {
+      await (await loader.getHarness(MatButtonHarness.with({ text }))).click();
+    }
+
+    async function clickLabelled(label: string) {
+      await (
+        await loader.getHarness(MatButtonHarness.with({ selector: `[aria-label="${label}"]` }))
+      ).click();
+    }
+
+    it('adds an employee through the form and refreshes the list', async () => {
+      await render(aPageOf([ASHA]), anEmployee({ id: 9 }));
+      const loadsBefore = api.list.mock.calls.length;
+
+      await click('Add employee');
+
+      expect(dialog.open).toHaveBeenCalledWith(
+        EmployeeFormDialog,
+        expect.objectContaining({ data: { employee: undefined, options: FILTER_OPTIONS } }),
+      );
+      expect(api.list.mock.calls.length).toBe(loadsBefore + 1);
+    });
+
+    it('edits an employee through the form, starting from their details', async () => {
+      await render(aPageOf([ASHA]), ASHA);
+
+      await clickLabelled('Edit Asha Rao');
+
+      expect(dialog.open).toHaveBeenCalledWith(
+        EmployeeFormDialog,
+        expect.objectContaining({ data: { employee: ASHA, options: FILTER_OPTIONS } }),
+      );
+    });
+
+    it('leaves the list alone when the form is cancelled', async () => {
+      await render(aPageOf([ASHA]), undefined);
+      const loadsBefore = api.list.mock.calls.length;
+
+      await click('Add employee');
+
+      expect(api.list.mock.calls.length).toBe(loadsBefore);
+    });
+
+    it('deletes an employee only after confirmation', async () => {
+      await render(aPageOf([ASHA]), true);
+      const loadsBefore = api.list.mock.calls.length;
+
+      await clickLabelled('Delete Asha Rao');
+
+      expect(dialog.open).toHaveBeenCalledWith(ConfirmDialog, expect.anything());
+      expect(api.delete).toHaveBeenCalledWith(7);
+      expect(api.list.mock.calls.length).toBe(loadsBefore + 1);
+    });
+
+    it('keeps the employee when deletion is cancelled', async () => {
+      await render(aPageOf([ASHA]), false);
+
+      await clickLabelled('Delete Asha Rao');
+
+      expect(api.delete).not.toHaveBeenCalled();
     });
   });
 });
