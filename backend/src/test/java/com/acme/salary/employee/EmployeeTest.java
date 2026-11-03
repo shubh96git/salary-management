@@ -1,10 +1,9 @@
 package com.acme.salary.employee;
 
+import static com.acme.salary.employee.EmployeeFixtures.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.acme.salary.common.Country;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Currency;
 import org.junit.jupiter.api.Test;
 
@@ -12,28 +11,17 @@ class EmployeeTest {
 
     @Test
     void isPaidInTheCurrencyOfItsCountry() {
-        Employee employee = new Employee(detailsIn(Country.INDIA));
+        Employee employee = new Employee(anEmployee().withCountry(Country.INDIA).details());
 
         assertThat(employee.getCurrency()).isEqualTo(Currency.getInstance("INR"));
     }
 
     @Test
     void switchesCurrencyWhenMovedToAnotherCountry() {
-        Employee employee = new Employee(detailsIn(Country.INDIA));
+        Employee employee = new Employee(anEmployee().withCountry(Country.INDIA).details());
 
-        employee.update(detailsIn(Country.GERMANY));
+        employee.update(anEmployee().withCountry(Country.GERMANY).details());
 
         assertThat(employee.getCurrency()).isEqualTo(Currency.getInstance("EUR"));
-    }
-
-    private static EmployeeDetails detailsIn(Country country) {
-        return new EmployeeDetails(
-                "Asha Rao",
-                "asha.rao@acme.example",
-                "Software Engineer",
-                "Engineering",
-                country,
-                new BigDecimal("1500000.00"),
-                LocalDate.of(2021, 4, 1));
     }
 }
