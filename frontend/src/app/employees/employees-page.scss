@@ -3,6 +3,21 @@
   margin: 0 0 16px;
 }
 
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 12px;
+
+  mat-form-field {
+    flex: 1 1 180px;
+  }
+
+  .search-field {
+    flex: 2 1 260px;
+  }
+}
+
 .results {
   position: relative;
   overflow-x: auto;

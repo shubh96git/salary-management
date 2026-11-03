@@ -1,10 +1,19 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { EmployeeApi } from './employee-api';
-import { EmployeeQuery } from './employee.model';
+import { EmployeeQuery, FilterOptions } from './employee.model';
 
 const FIRST_PAGE: EmployeeQuery = {
   search: '',
@@ -17,9 +26,28 @@ const FIRST_PAGE: EmployeeQuery = {
   direction: 'asc',
 };
 
+const NO_OPTIONS: FilterOptions = { countries: [], jobTitles: [], departments: [] };
+
+const SEARCH_DELAY_MS = 300;
+
+type Filter = 'country' | 'jobTitle' | 'department';
+
 @Component({
   selector: 'app-employees-page',
-  imports: [CurrencyPipe, DatePipe, MatTableModule, MatProgressBarModule],
+  imports: [
+    CurrencyPipe,
+    DatePipe,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatSelectModule,
+    MatSortModule,
+    MatTableModule,
+  ],
   templateUrl: './employees-page.html',
   styleUrl: './employees-page.scss',
 })
@@ -34,8 +62,11 @@ export class EmployeesPage {
     'annualSalary',
     'hireDate',
   ];
+  protected readonly pageSizes = [20, 50, 100];
 
   protected readonly query = signal<EmployeeQuery>(FIRST_PAGE);
+  protected readonly search = new FormControl('', { nonNullable: true });
+  protected readonly options = toSignal(this.api.filterOptions(), { initialValue: NO_OPTIONS });
 
   protected readonly employees = rxResource({
     params: () => this.query(),
@@ -43,4 +74,43 @@ export class EmployeesPage {
   });
 
   protected readonly rows = computed(() => this.employees.value()?.content ?? []);
+  protected readonly total = computed(() => this.employees.value()?.totalElements ?? 0);
+  protected readonly hasFilters = computed(() => {
+    const { search, country, jobTitle, department } = this.query();
+    return Boolean(search || country || jobTitle || department);
+  });
+
+  constructor() {
+    this.search.valueChanges
+      .pipe(debounceTime(SEARCH_DELAY_MS), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((search) => this.narrow({ search }));
+  }
+
+  protected filterBy(filter: Filter, value: string): void {
+    this.narrow({ [filter]: value });
+  }
+
+  protected changePage(event: PageEvent): void {
+    this.query.update((query) => ({ ...query, page: event.pageIndex, size: event.pageSize }));
+  }
+
+  protected changeSort(sort: Sort): void {
+    // Material cycles asc → desc → none; "none" falls back to the default order.
+    this.query.update((query) => ({
+      ...query,
+      sort: sort.direction ? sort.active : FIRST_PAGE.sort,
+      direction: sort.direction || FIRST_PAGE.direction,
+      page: 0,
+    }));
+  }
+
+  protected clearFilters(): void {
+    this.search.setValue('', { emitEvent: false });
+    this.narrow({ search: '', country: '', jobTitle: '', department: '' });
+  }
+
+  /** Any change to what is shown starts again from the first page. */
+  private narrow(changes: Partial<EmployeeQuery>): void {
+    this.query.update((query) => ({ ...query, ...changes, page: 0 }));
+  }
 }
