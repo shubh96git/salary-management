@@ -9,10 +9,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.acme.salary.common.Country;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -26,6 +32,80 @@ class EmployeeControllerTest {
 
     @MockitoBean
     private EmployeeService service;
+
+    @Test
+    void listsOnePageOfEmployees() {
+        when(service.search(any(), any())).thenReturn(
+                new PageImpl<>(List.of(anEmployee().persistedWithId(7L)), PageRequest.of(0, 20), 41));
+
+        assertThat(mvc.get().uri("/api/employees"))
+                .hasStatusOk()
+                .bodyJson()
+                .isLenientlyEqualTo("""
+                        {
+                          "content": [ { "id": 7, "fullName": "Asha Rao" } ],
+                          "page": 0,
+                          "size": 20,
+                          "totalElements": 41,
+                          "totalPages": 3
+                        }
+                        """);
+    }
+
+    @Test
+    void passesFiltersPagingAndSortingToTheService() {
+        when(service.search(any(), any())).thenReturn(Page.empty());
+
+        assertThat(mvc.get().uri("/api/employees?search=rao&country=in&jobTitle=Engineer&department=Product"
+                + "&page=2&size=50&sort=annualSalary,desc"))
+                .hasStatusOk();
+
+        ArgumentCaptor<EmployeeSearchCriteria> criteria = ArgumentCaptor.forClass(EmployeeSearchCriteria.class);
+        ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
+        verify(service).search(criteria.capture(), pageable.capture());
+        assertThat(criteria.getValue())
+                .isEqualTo(new EmployeeSearchCriteria("rao", Country.INDIA, "Engineer", "Product"));
+        assertThat(pageable.getValue())
+                .isEqualTo(PageRequest.of(2, 50, Sort.by(Sort.Direction.DESC, "annualSalary")));
+    }
+
+    @Test
+    void defaultsToFirstTwentyEmployeesSortedByName() {
+        when(service.search(any(), any())).thenReturn(Page.empty());
+
+        assertThat(mvc.get().uri("/api/employees")).hasStatusOk();
+
+        ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
+        verify(service).search(any(), pageable.capture());
+        assertThat(pageable.getValue()).isEqualTo(PageRequest.of(0, 20, Sort.by("fullName")));
+    }
+
+    @Test
+    void capsPageSizeAtOneHundred() {
+        when(service.search(any(), any())).thenReturn(Page.empty());
+
+        assertThat(mvc.get().uri("/api/employees?size=5000")).hasStatusOk();
+
+        ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
+        verify(service).search(any(), pageable.capture());
+        assertThat(pageable.getValue().getPageSize()).isEqualTo(100);
+    }
+
+    @Test
+    void rejectsUnknownCountryFilter() {
+        assertThat(mvc.get().uri("/api/employees?country=XX"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("$.detail").isEqualTo("Unknown country code: XX");
+    }
+
+    @Test
+    void rejectsSortingByAnUnsupportedField() {
+        assertThat(mvc.get().uri("/api/employees?sort=createdAt"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("$.detail").asString().contains("createdAt");
+    }
 
     @Test
     void returnsEmployeeById() {
