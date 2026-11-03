@@ -3,6 +3,8 @@ package com.acme.salary.employee;
 import static com.acme.salary.employee.EmployeeFixtures.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -115,6 +117,39 @@ class EmployeeControllerTest {
                 .hasStatus(HttpStatus.CONFLICT)
                 .bodyJson()
                 .extractingPath("$.detail").isEqualTo("An employee with email asha.rao@acme.example already exists");
+    }
+
+    @Test
+    void updatesEmployee() {
+        when(service.update(eq(7L), any(EmployeeDetails.class)))
+                .thenReturn(anEmployee().withCountry(Country.GERMANY).persistedWithId(7L));
+
+        assertThat(mvc.put().uri("/api/employees/7").contentType(MediaType.APPLICATION_JSON).content(VALID_REQUEST))
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.currency").isEqualTo("EUR");
+    }
+
+    @Test
+    void answersNotFoundWhenUpdatingUnknownEmployee() {
+        when(service.update(eq(99L), any(EmployeeDetails.class))).thenThrow(new EmployeeNotFoundException(99L));
+
+        assertThat(mvc.put().uri("/api/employees/99").contentType(MediaType.APPLICATION_JSON).content(VALID_REQUEST))
+                .hasStatus(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void deletesEmployee() {
+        assertThat(mvc.delete().uri("/api/employees/7")).hasStatus(HttpStatus.NO_CONTENT);
+
+        verify(service).delete(7L);
+    }
+
+    @Test
+    void answersNotFoundWhenDeletingUnknownEmployee() {
+        doThrow(new EmployeeNotFoundException(99L)).when(service).delete(99L);
+
+        assertThat(mvc.delete().uri("/api/employees/99")).hasStatus(HttpStatus.NOT_FOUND);
     }
 
     private static final String VALID_REQUEST = """
