@@ -1,7 +1,6 @@
 package com.acme.salary.employee;
 
 import com.acme.salary.common.Country;
-import com.acme.salary.common.UnknownCountryException;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,14 +23,12 @@ public record EmployeeRequest(
         @NotNull LocalDate hireDate) {
 
     EmployeeDetails toDetails() {
-        Country country = Country.fromCode(countryCode)
-                .orElseThrow(() -> new UnknownCountryException(countryCode));
         return new EmployeeDetails(
                 fullName.strip(),
                 email.strip(),
                 jobTitle.strip(),
                 department.strip(),
-                country,
+                Country.require(countryCode),
                 annualSalary,
                 hireDate);
     }

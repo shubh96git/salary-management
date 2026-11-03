@@ -1,6 +1,7 @@
 package com.acme.salary.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Currency;
 import org.junit.jupiter.api.Test;
@@ -31,5 +32,13 @@ class CountryTest {
     void paysInLocalCurrency() {
         assertThat(Country.INDIA.currency()).isEqualTo(Currency.getInstance("INR"));
         assertThat(Country.GERMANY.currency()).isEqualTo(Currency.getInstance("EUR"));
+    }
+
+    @Test
+    void requiresASupportedCountry() {
+        assertThat(Country.require("gb")).isEqualTo(Country.UNITED_KINGDOM);
+        assertThatThrownBy(() -> Country.require("XX"))
+                .isInstanceOf(UnknownCountryException.class)
+                .hasMessage("Unknown country code: XX");
     }
 }

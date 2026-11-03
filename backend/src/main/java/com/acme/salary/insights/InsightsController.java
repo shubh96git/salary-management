@@ -1,7 +1,6 @@
 package com.acme.salary.insights;
 
 import com.acme.salary.common.Country;
-import com.acme.salary.common.UnknownCountryException;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,15 +28,11 @@ public class InsightsController {
 
     @GetMapping("/countries/{countryCode}/job-titles")
     public List<SalaryStats> byJobTitle(@PathVariable String countryCode) {
-        return insights.byJobTitle(toCountry(countryCode));
+        return insights.byJobTitle(Country.require(countryCode));
     }
 
     @GetMapping("/countries/{countryCode}/departments")
     public List<SalaryStats> byDepartment(@PathVariable String countryCode) {
-        return insights.byDepartment(toCountry(countryCode));
-    }
-
-    private static Country toCountry(String code) {
-        return Country.fromCode(code).orElseThrow(() -> new UnknownCountryException(code));
+        return insights.byDepartment(Country.require(countryCode));
     }
 }

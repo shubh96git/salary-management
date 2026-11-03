@@ -2,7 +2,6 @@ package com.acme.salary.employee;
 
 import com.acme.salary.common.Country;
 import com.acme.salary.common.PageResponse;
-import com.acme.salary.common.UnknownCountryException;
 import com.acme.salary.common.UnsupportedSortException;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -80,7 +79,7 @@ public class EmployeeController {
         if (code == null || code.isBlank()) {
             return null;
         }
-        return Country.fromCode(code).orElseThrow(() -> new UnknownCountryException(code));
+        return Country.require(code);
     }
 
     private static void rejectUnsupportedSort(Sort sort) {

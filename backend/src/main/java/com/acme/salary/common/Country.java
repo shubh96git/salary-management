@@ -30,6 +30,13 @@ public enum Country {
                 .findFirst();
     }
 
+    /**
+     * @throws UnknownCountryException if the code is not a supported country
+     */
+    public static Country require(String code) {
+        return fromCode(code).orElseThrow(() -> new UnknownCountryException(code));
+    }
+
     public String code() {
         return code;
     }
