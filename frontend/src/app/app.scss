@@ -1,0 +1,29 @@
+.toolbar {
+  gap: 12px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.product-name {
+  font: var(--mat-sys-title-large);
+}
+
+.navigation {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+
+  a {
+    color: inherit;
+  }
+
+  .active {
+    background: color-mix(in srgb, var(--mat-sys-on-primary) 16%, transparent);
+  }
+}
+
+.content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
