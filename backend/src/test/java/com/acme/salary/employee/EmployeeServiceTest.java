@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Optional;
+import com.acme.salary.common.Country;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -90,5 +91,29 @@ class EmployeeServiceTest {
         assertThatThrownBy(() -> service.get(99L))
                 .isInstanceOf(EmployeeNotFoundException.class)
                 .hasMessageContaining("99");
+    }
+
+    @Test
+    void updatesExistingEmployee() {
+        Employee existing = new Employee(anEmployee().withCountry(Country.INDIA).details());
+        when(repository.findById(7L)).thenReturn(Optional.of(existing));
+        EmployeeDetails relocated = anEmployee()
+                .withEmail("asha.rao@acme.de")
+                .withCountry(Country.GERMANY)
+                .details();
+
+        Employee updated = service.update(7L, relocated);
+
+        assertThat(updated).isNotNull();
+        assertThat(updated.getEmail()).isEqualTo("asha.rao@acme.de");
+        assertThat(updated.getCountry()).isEqualTo(Country.GERMANY);
+    }
+
+    @Test
+    void reportsUnknownEmployeeOnUpdate() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(99L, anEmployee().details()))
+                .isInstanceOf(EmployeeNotFoundException.class);
     }
 }

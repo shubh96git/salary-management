@@ -30,6 +30,10 @@ public class EmployeeService {
         return repository.save(new Employee(details));
     }
 
+    public Employee update(Long id, EmployeeDetails details) {
+        return null;
+    }
+
     private void rejectFutureHireDate(EmployeeDetails details) {
         if (details.hireDate().isAfter(LocalDate.now(clock))) {
             throw new InvalidEmployeeException("Hire date cannot be in the future");
