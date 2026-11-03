@@ -15,6 +15,8 @@ import java.util.Currency;
 @Table(name = "employee")
 public class Employee {
 
+    private static final int MONEY_SCALE = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -58,7 +60,8 @@ public class Employee {
         this.department = details.department();
         this.country = details.country();
         this.currency = details.country().currency();
-        this.annualSalary = details.annualSalary();
+        // Without a rounding mode, a value with more than two decimals fails loudly instead of being rounded.
+        this.annualSalary = details.annualSalary().setScale(MONEY_SCALE);
         this.hireDate = details.hireDate();
     }
 
