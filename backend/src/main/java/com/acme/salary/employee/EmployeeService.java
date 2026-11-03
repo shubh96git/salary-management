@@ -2,6 +2,8 @@ package com.acme.salary.employee;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,11 @@ public class EmployeeService {
     public EmployeeService(EmployeeRepository repository, Clock clock) {
         this.repository = repository;
         this.clock = clock;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Employee> search(EmployeeSearchCriteria criteria, Pageable pageable) {
+        return Page.empty(pageable);
     }
 
     @Transactional(readOnly = true)

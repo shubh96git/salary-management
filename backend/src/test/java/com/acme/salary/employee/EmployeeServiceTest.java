@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,11 +14,17 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 import com.acme.salary.common.Country;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -150,5 +157,17 @@ class EmployeeServiceTest {
 
         assertThatThrownBy(() -> service.delete(99L))
                 .isInstanceOf(EmployeeNotFoundException.class);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void searchesOnePageOfEmployees() {
+        Pageable firstPage = PageRequest.of(0, 20);
+        Page<Employee> matches = new PageImpl<>(List.of(new Employee(anEmployee().details())), firstPage, 1);
+        when(repository.findAll(any(Specification.class), eq(firstPage))).thenReturn(matches);
+
+        Page<Employee> result = service.search(new EmployeeSearchCriteria("asha", Country.INDIA, null, null), firstPage);
+
+        assertThat(result).isSameAs(matches);
     }
 }
