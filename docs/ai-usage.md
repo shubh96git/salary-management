@@ -53,3 +53,10 @@ How AI tools were used to build this project, what they were asked, and where th
   - One test run reported "unresolved compilation problems" because the IDE's background compiler rewrote `target/` mid-build. Diagnosed from the error format and fixed by always running clean builds.
   - Unit tests passed, but a manual end-to-end run against MySQL showed an updated salary returned as `61000` instead of `61000.00`. Fixed in the domain with a new test.
 - **Developer judgement:** Chose red/green commits so test-first is visible in the history; asked for every step to be committed and nothing pushed until reviewed.
+
+### 7. Seed data
+
+- **Prompt (summary):** Seed 10,000 employees.
+- **AI output:** A pure, deterministic generator (country-typical names, job-to-department mapping, salary bands scaled per market) tested for size, determinism, unique emails, valid data and pay seniority; plus an idempotent JDBC batch seeder tested against MySQL.
+- **Where AI output was checked or corrected:** Seeding took 8–10 s, which looked too slow. Instead of tuning blindly, the time was measured: a raw SQL insert of the same 10,000 rows took 7.3 s, proving the local database, not the code, was the limit. Recorded in [performance.md](performance.md).
+- **Developer judgement:** Seeding stays off by default and is enabled per environment.
