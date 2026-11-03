@@ -1,0 +1,23 @@
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  padding-top: 8px;
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.failure {
+  grid-column: 1 / -1;
+  margin: 0 0 8px;
+  padding: 12px;
+  border-radius: 4px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}

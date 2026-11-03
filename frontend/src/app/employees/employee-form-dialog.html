@@ -1,0 +1,74 @@
+<h2 mat-dialog-title>{{ editing ? 'Edit employee' : 'Add employee' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <mat-dialog-content class="fields">
+    @if (failure()) {
+      <p class="failure" role="alert">{{ failure() }}</p>
+    }
+
+    <mat-form-field appearance="outline" class="field-fullName wide">
+      <mat-label>Full name</mat-label>
+      <input matInput formControlName="fullName" autocomplete="off" />
+      <mat-error>{{ errorFor('fullName') }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-email wide">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" autocomplete="off" />
+      <mat-error>{{ errorFor('email') }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-jobTitle">
+      <mat-label>Job title</mat-label>
+      <input matInput formControlName="jobTitle" [matAutocomplete]="jobTitles" />
+      <mat-autocomplete #jobTitles="matAutocomplete">
+        @for (jobTitle of data.options.jobTitles; track jobTitle) {
+          <mat-option [value]="jobTitle">{{ jobTitle }}</mat-option>
+        }
+      </mat-autocomplete>
+      <mat-error>{{ errorFor('jobTitle') }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-department">
+      <mat-label>Department</mat-label>
+      <input matInput formControlName="department" [matAutocomplete]="departments" />
+      <mat-autocomplete #departments="matAutocomplete">
+        @for (department of data.options.departments; track department) {
+          <mat-option [value]="department">{{ department }}</mat-option>
+        }
+      </mat-autocomplete>
+      <mat-error>{{ errorFor('department') }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-countryCode">
+      <mat-label>Country</mat-label>
+      <mat-select formControlName="countryCode">
+        @for (country of data.options.countries; track country.code) {
+          <mat-option [value]="country.code">{{ country.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-error>{{ errorFor('countryCode') }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-annualSalary">
+      <mat-label>Annual salary</mat-label>
+      <input matInput formControlName="annualSalary" type="number" min="0" step="100" />
+      @if (currency(); as currency) {
+        <span matTextSuffix>{{ currency }}</span>
+        <mat-hint>Annual gross, in {{ currency }}</mat-hint>
+      }
+      <mat-error>{{ errorFor('annualSalary') }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-hireDate">
+      <mat-label>Hire date</mat-label>
+      <input matInput formControlName="hireDate" type="date" [max]="today" />
+      <mat-error>{{ errorFor('hireDate') }}</mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancel</button>
+    <button mat-flat-button type="submit" [disabled]="saving()">Save</button>
+  </mat-dialog-actions>
+</form>
