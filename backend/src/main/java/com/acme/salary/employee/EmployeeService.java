@@ -36,6 +36,9 @@ public class EmployeeService {
         return employee;
     }
 
+    public void delete(Long id) {
+    }
+
     private void rejectFutureHireDate(EmployeeDetails details) {
         if (details.hireDate().isAfter(LocalDate.now(clock))) {
             throw new InvalidEmployeeException("Hire date cannot be in the future");

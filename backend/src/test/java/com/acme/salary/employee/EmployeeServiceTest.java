@@ -133,4 +133,22 @@ class EmployeeServiceTest {
         assertThatThrownBy(() -> service.update(7L, anEmployee().withHireDate(TODAY.plusDays(1)).details()))
                 .isInstanceOf(InvalidEmployeeException.class);
     }
+
+    @Test
+    void deletesExistingEmployee() {
+        Employee existing = new Employee(anEmployee().details());
+        when(repository.findById(7L)).thenReturn(Optional.of(existing));
+
+        service.delete(7L);
+
+        verify(repository).delete(existing);
+    }
+
+    @Test
+    void reportsUnknownEmployeeOnDelete() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.delete(99L))
+                .isInstanceOf(EmployeeNotFoundException.class);
+    }
 }
