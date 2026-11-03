@@ -17,6 +17,11 @@ public class EmployeeService {
         this.clock = clock;
     }
 
+    @Transactional(readOnly = true)
+    public Employee get(Long id) {
+        return null;
+    }
+
     public Employee create(EmployeeDetails details) {
         rejectFutureHireDate(details);
         if (repository.existsByEmail(details.email())) {

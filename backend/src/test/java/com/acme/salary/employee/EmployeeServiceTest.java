@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,5 +73,22 @@ class EmployeeServiceTest {
         Employee created = service.create(anEmployee().withHireDate(TODAY).details());
 
         assertThat(created.getHireDate()).isEqualTo(TODAY);
+    }
+
+    @Test
+    void findsEmployeeById() {
+        Employee existing = new Employee(anEmployee().details());
+        when(repository.findById(7L)).thenReturn(Optional.of(existing));
+
+        assertThat(service.get(7L)).isSameAs(existing);
+    }
+
+    @Test
+    void reportsUnknownEmployee() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.get(99L))
+                .isInstanceOf(EmployeeNotFoundException.class)
+                .hasMessageContaining("99");
     }
 }
