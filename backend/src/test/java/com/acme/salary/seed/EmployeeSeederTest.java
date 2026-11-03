@@ -6,18 +6,13 @@ import static org.assertj.core.api.Assertions.tuple;
 import com.acme.salary.employee.Employee;
 import com.acme.salary.employee.EmployeeDetails;
 import com.acme.salary.employee.EmployeeRepository;
+import com.acme.salary.support.DatabaseTest;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 
-/**
- * Runs against the real MySQL schema created by Flyway; each test rolls back.
- */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseTest
 @Import(EmployeeSeeder.class)
 class EmployeeSeederTest {
 

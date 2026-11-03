@@ -4,18 +4,13 @@ import static com.acme.salary.employee.EmployeeFixtures.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.acme.salary.common.Country;
+import com.acme.salary.support.DatabaseTest;
 import jakarta.persistence.EntityManager;
 import java.util.Currency;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
-/**
- * Runs against the real MySQL schema created by Flyway; each test rolls back.
- */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseTest
 class EmployeeRepositoryTest {
 
     @Autowired

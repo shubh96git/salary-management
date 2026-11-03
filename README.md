@@ -35,11 +35,13 @@ Run once as the MySQL `root` user:
 
 ```sql
 CREATE DATABASE salary_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE salary_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'salary_app'@'localhost' IDENTIFIED BY '<password>';
 GRANT ALL PRIVILEGES ON salary_management.* TO 'salary_app'@'localhost';
+GRANT ALL PRIVILEGES ON salary_management_test.* TO 'salary_app'@'localhost';
 ```
 
-The schema itself is created by Flyway when the application starts.
+The schema itself is created by Flyway when the application starts. Tests use the separate `salary_management_test` database (override with `TEST_DB_URL`), so they never see development or seed data.
 
 ### Configuration
 

@@ -1,0 +1,4 @@
+# Tests use their own database so they never see (or break on) development or seed data.
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:mysql://localhost:3306/salary_management_test}

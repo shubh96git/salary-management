@@ -4,18 +4,16 @@ import static com.acme.salary.employee.EmployeeFixtures.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.acme.salary.common.Country;
+import com.acme.salary.support.DatabaseTest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 /**
- * Search filters run as SQL, so they are tested against the real MySQL schema; each test rolls back.
+ * Search filters run as SQL, so they are tested against MySQL rather than mocks.
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DatabaseTest
 class EmployeeSearchTest {
 
     @Autowired
