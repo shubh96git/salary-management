@@ -37,6 +37,7 @@ public class EmployeeService {
     }
 
     public void delete(Long id) {
+        repository.delete(get(id));
     }
 
     private void rejectFutureHireDate(EmployeeDetails details) {
