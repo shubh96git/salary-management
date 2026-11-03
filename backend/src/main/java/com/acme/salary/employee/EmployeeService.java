@@ -31,7 +31,9 @@ public class EmployeeService {
     }
 
     public Employee update(Long id, EmployeeDetails details) {
-        return null;
+        Employee employee = get(id);
+        employee.update(details);
+        return employee;
     }
 
     private void rejectFutureHireDate(EmployeeDetails details) {
