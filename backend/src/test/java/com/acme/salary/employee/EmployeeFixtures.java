@@ -26,8 +26,23 @@ final class EmployeeFixtures {
         private BigDecimal annualSalary = new BigDecimal("1500000.00");
         private LocalDate hireDate = LocalDate.of(2021, 4, 1);
 
+        Builder withFullName(String fullName) {
+            this.fullName = fullName;
+            return this;
+        }
+
         Builder withEmail(String email) {
             this.email = email;
+            return this;
+        }
+
+        Builder withJobTitle(String jobTitle) {
+            this.jobTitle = jobTitle;
+            return this;
+        }
+
+        Builder withDepartment(String department) {
+            this.department = department;
             return this;
         }
 
