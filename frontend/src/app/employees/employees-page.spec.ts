@@ -186,7 +186,9 @@ describe('EmployeesPage', () => {
   describe('changing employees', () => {
     const ASHA = anEmployee({ id: 7, fullName: 'Asha Rao' });
 
-    async function click(text: string) {
+    /** Matches the visible label; icon ligature names (e.g. "person_add") are also text in the DOM. */
+    async function click(label: string) {
+      const text = new RegExp(`${label}$`);
       await (await loader.getHarness(MatButtonHarness.with({ text }))).click();
     }
 
