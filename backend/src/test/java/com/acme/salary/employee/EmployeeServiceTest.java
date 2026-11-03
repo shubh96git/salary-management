@@ -116,4 +116,21 @@ class EmployeeServiceTest {
         assertThatThrownBy(() -> service.update(99L, anEmployee().details()))
                 .isInstanceOf(EmployeeNotFoundException.class);
     }
+
+    @Test
+    void rejectsEmailUsedByAnotherEmployeeOnUpdate() {
+        when(repository.findById(7L)).thenReturn(Optional.of(new Employee(anEmployee().details())));
+        when(repository.existsByEmailAndIdNot("taken@acme.example", 7L)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.update(7L, anEmployee().withEmail("taken@acme.example").details()))
+                .isInstanceOf(DuplicateEmailException.class);
+    }
+
+    @Test
+    void rejectsFutureHireDateOnUpdate() {
+        when(repository.findById(7L)).thenReturn(Optional.of(new Employee(anEmployee().details())));
+
+        assertThatThrownBy(() -> service.update(7L, anEmployee().withHireDate(TODAY.plusDays(1)).details()))
+                .isInstanceOf(InvalidEmployeeException.class);
+    }
 }
