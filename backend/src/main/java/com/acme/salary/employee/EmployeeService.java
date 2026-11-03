@@ -24,18 +24,14 @@ public class EmployeeService {
 
     public Employee create(EmployeeDetails details) {
         rejectFutureHireDate(details);
-        if (repository.existsByEmail(details.email())) {
-            throw new DuplicateEmailException(details.email());
-        }
+        rejectEmailInUse(repository.existsByEmail(details.email()), details.email());
         return repository.save(new Employee(details));
     }
 
     public Employee update(Long id, EmployeeDetails details) {
         Employee employee = get(id);
         rejectFutureHireDate(details);
-        if (repository.existsByEmailAndIdNot(details.email(), id)) {
-            throw new DuplicateEmailException(details.email());
-        }
+        rejectEmailInUse(repository.existsByEmailAndIdNot(details.email(), id), details.email());
         employee.update(details);
         return employee;
     }
@@ -43,6 +39,12 @@ public class EmployeeService {
     private void rejectFutureHireDate(EmployeeDetails details) {
         if (details.hireDate().isAfter(LocalDate.now(clock))) {
             throw new InvalidEmployeeException("Hire date cannot be in the future");
+        }
+    }
+
+    private static void rejectEmailInUse(boolean inUse, String email) {
+        if (inUse) {
+            throw new DuplicateEmailException(email);
         }
     }
 }
