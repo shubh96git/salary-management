@@ -1,8 +1,12 @@
 package com.acme.salary.employee;
 
+import com.acme.salary.common.Country;
 import com.acme.salary.common.PageResponse;
+import com.acme.salary.common.UnknownCountryException;
+import com.acme.salary.common.UnsupportedSortException;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -24,6 +28,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
+    private static final Set<String> SORTABLE_FIELDS =
+            Set.of("fullName", "email", "jobTitle", "department", "country", "annualSalary", "hireDate");
+
     private final EmployeeService service;
 
     public EmployeeController(EmployeeService service) {
@@ -37,7 +44,10 @@ public class EmployeeController {
             @RequestParam(required = false) String jobTitle,
             @RequestParam(required = false) String department,
             @PageableDefault(size = 20, sort = "fullName", direction = Sort.Direction.ASC) Pageable pageable) {
-        return null;
+        rejectUnsupportedSort(pageable.getSort());
+        EmployeeSearchCriteria criteria =
+                new EmployeeSearchCriteria(search, toCountry(country), jobTitle, department);
+        return PageResponse.from(service.search(criteria, pageable), EmployeeResponse::from);
     }
 
     @GetMapping("/{id}")
@@ -64,5 +74,22 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    private static Country toCountry(String code) {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        return Country.fromCode(code).orElseThrow(() -> new UnknownCountryException(code));
+    }
+
+    private static void rejectUnsupportedSort(Sort sort) {
+        sort.stream()
+                .map(Sort.Order::getProperty)
+                .filter(property -> !SORTABLE_FIELDS.contains(property))
+                .findFirst()
+                .ifPresent(property -> {
+                    throw new UnsupportedSortException(property);
+                });
     }
 }
