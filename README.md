@@ -2,7 +2,7 @@
 
 A web application for ACME's HR Manager to manage salary data for 10,000 employees across multiple countries and understand how the organisation pays people.
 
-- **Live application:** _link added after deployment_
+- **Live application:** <https://salary-management-production-07aa.up.railway.app> (Railway; Docker image plus managed MySQL, seeded with 10,000 employees)
 - **Video demo:** _link added after recording_
 
 ## What it does
