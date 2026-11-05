@@ -1,6 +1,6 @@
 # Delivery Plan
 
-How the solution will be built, in order. Each milestone ends in a working, tested state.
+How the solution will be built, in order. Each milestone ends in a working, tested state. All milestones are complete except deployment and the demo video, which follow the code review.
 
 ## Milestones
 

@@ -2,7 +2,28 @@
 
 A web application for ACME's HR Manager to manage salary data for 10,000 employees across multiple countries and understand how the organisation pays people.
 
-> **Status:** planning complete; implementation in progress.
+- **Live application:** _link added after deployment_
+- **Video demo:** _link added after recording_
+
+## What it does
+
+- **Employees:** find anyone among 10,000 employees by name or email; filter by country, job title and department; sort and page; add, edit and delete with validation. Salaries are shown in each employee's local currency.
+- **Insights:** headcount, median, average, range and total payroll per country, then per job title or department within a country, so the HR Manager can answer "how does the organisation pay people?" without spreadsheets.
+
+What is in scope, what was deliberately left out and why, is in the [requirements document](docs/requirements.md), written before any code.
+
+## How it was built
+
+- **Planning first:** requirements, architecture, decision records and the delivery plan were committed before the first line of code.
+- **Test-driven, visibly:** each behaviour was added as a failing-test commit (`test:`) followed by the commit that makes it pass (`feat:`/`fix:`), with `refactor:` commits where the design improved. Only `test:` commits contain failing tests.
+- **AI-assisted, developer-directed:** built with Claude Code under the instructions in [CLAUDE.md](CLAUDE.md). [docs/ai-usage.md](docs/ai-usage.md) records what AI was asked, and where its output was checked or corrected.
+
+| Quality measure | Backend | Frontend |
+|---|---|---|
+| Tests | 69 (JUnit, Spring test slices, MySQL) | 36 (Vitest, Material component harnesses) |
+| Line coverage | 95% | 96% |
+| Branch coverage | 83% | 83% |
+| API response time over 10,000 employees | 20–150 ms ([details](docs/performance.md)) | |
 
 ## Documentation
 
@@ -18,7 +39,7 @@ A web application for ACME's HR Manager to manage salary data for 10,000 employe
 
 ## Tech stack
 
-Java 21 · Spring Boot 4 · MySQL 8 · Flyway · Angular · Angular Material
+Java 21 · Spring Boot 4 · MySQL 8 · Flyway · Angular 22 · Angular Material
 
 ## Running locally
 
@@ -75,7 +96,7 @@ To reseed from scratch, empty the table (`TRUNCATE TABLE employee;`) and start a
 ```bash
 cd backend
 ./mvnw spring-boot:run    # start on http://localhost:8080
-./mvnw test               # run the tests
+./mvnw test               # run the tests; coverage report in target/site/jacoco/index.html
 ```
 
 Health check: <http://localhost:8080/actuator/health>
@@ -89,7 +110,21 @@ cd frontend
 npm ci                    # install the exact dependency versions from package-lock.json
 npm start                 # start on http://localhost:4200; /api is proxied to the backend
 npm test -- --watch=false # run the tests once
+npm run test:coverage     # run the tests with a coverage report in coverage/
 ```
+
+## Deployment
+
+The [Dockerfile](Dockerfile) builds one image: it compiles the Angular app, bundles it into the Spring Boot jar as static content, and runs it on a Java 21 runtime. Any host that builds Dockerfiles and provides MySQL 8 can run it with these variables:
+
+| Variable | Value |
+|---|---|
+| `DB_URL` | `jdbc:mysql://<host>:<port>/<database>` |
+| `DB_USERNAME`, `DB_PASSWORD` | Database credentials |
+| `SEED_ENABLED` | `true` to load 10,000 employees on first start |
+| `PORT` | Set by most hosts; defaults to 8080 |
+
+Flyway creates the schema on startup.
 
 ## Using the application
 
